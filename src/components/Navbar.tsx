@@ -24,10 +24,27 @@ export default function Navbar({ reveal }: NavbarProps) {
 
         filter: `blur(${(1 - reveal) * 8}px)`,
 
+        transform: `
+  translateY(${(1 - reveal) * -25}px)
+`,
+
+        transition: `
+  opacity 900ms ease,
+  transform 900ms ease,
+  filter 900ms ease
+`,
+
         zIndex: 20,
       }}
     >
-      <Image src={logo} alt="Videobunny" style={{ width: "160px" }} />
+      <Image
+        src={logo}
+        alt="Videobunny"
+        style={{
+          width: "clamp(110px, 18vw, 160px)",
+          height: "auto",
+        }}
+      />
       {/* <div
         style={{
           display: "flex",
@@ -56,7 +73,7 @@ export default function Navbar({ reveal }: NavbarProps) {
 
           borderRadius: 999,
 
-          padding: "12px 30px",
+          padding: "clamp(8px,1.8vw,12px) clamp(18px,3vw,30px)",
 
           fontSize: 16,
 

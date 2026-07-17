@@ -1,47 +1,61 @@
 "use client";
 
-import useScrollProgress from "@/hooks/useScrollProgress";
 import RibbonShader from "./RibbonShader";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Navbar from "./Navbar";
 import PhoneStack from "./PhoneShowcase";
+import { createTimeline } from "animejs";
 
 export default function ScrollScene() {
-  const { progress } = useScrollProgress();
+  const [formation, setFormation] = useState(0);
+  const [headlineReveal, setHeadlineReveal] = useState(0);
+  const [navReveal, setNavReveal] = useState(0);
+  const [phoneReveal, setPhoneReveal] = useState(0);
+  const [phoneSpread, setPhoneSpread] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
 
-  const targetFormation = Math.min(Math.max((progress - 0.02) / 0.35, 0), 1);
-
-  const formationRef = useRef(0);
-  const [, forceUpdate] = useState(0);
-
-  const headlineReveal = Math.min(
-    Math.max((formationRef.current - 0.35) / 0.2, 0),
-    1,
-  );
-
-  const navReveal = Math.min(
-    Math.max((formationRef.current - 0.7) / 0.15, 0),
-    1,
-  );
-
-  const phoneReveal = Math.min(Math.max((progress - 0.65) / 0.15, 0), 1);
-
-  const phoneSpread = Math.min(Math.max((progress - 0.85) / 0.15, 0), 1);
   useEffect(() => {
-    let frame: number;
-
-    const animate = () => {
-      formationRef.current += (targetFormation - formationRef.current) * 0.06;
-
-      forceUpdate((v) => v + 1);
-
-      frame = requestAnimationFrame(animate);
+    const update = () => {
+      setIsMobile(window.innerWidth < 768);
     };
 
-    animate();
+    update();
 
-    return () => cancelAnimationFrame(frame);
-  }, [targetFormation]);
+    window.addEventListener("resize", update);
+
+    return () => {
+      window.removeEventListener("resize", update);
+    };
+  }, []);
+
+  useEffect(() => {
+    const timeline = createTimeline({
+      defaults: {
+        ease: "outQuart",
+      },
+    });
+
+    timeline
+      .call(() => {
+        setFormation(1);
+      }, 200)
+      .call(() => {
+        setNavReveal(1);
+      }, 1200)
+      .call(() => {
+        setHeadlineReveal(1);
+      }, 1600)
+      .call(() => {
+        setPhoneReveal(1);
+      }, 2800)
+      .call(() => {
+        setPhoneSpread(1);
+      }, 4200);
+
+    return () => {
+      timeline.revert();
+    };
+  }, []);
 
   return (
     <div
@@ -53,7 +67,7 @@ export default function ScrollScene() {
         overflow: "hidden",
       }}
     >
-      <RibbonShader formation={formationRef.current} />
+      <RibbonShader formation={formation} />
 
       <div
         style={{
@@ -64,7 +78,7 @@ export default function ScrollScene() {
           justifyContent: "center",
           alignItems: "flex-start",
 
-          paddingTop: "18vh",
+          paddingTop: isMobile ? "18vh" : "22vh",
 
           pointerEvents: "none",
         }}
@@ -72,7 +86,19 @@ export default function ScrollScene() {
         <div
           style={{
             opacity: headlineReveal,
+
             filter: `blur(${(1 - headlineReveal) * 12}px)`,
+
+            transform: `
+      translateY(${(1 - headlineReveal) * 40}px)
+    `,
+
+            transition: `
+      opacity 1200ms cubic-bezier(0.22, 1, 0.36, 1),
+      transform 1200ms cubic-bezier(0.22, 1, 0.36, 1),
+      filter 1200ms cubic-bezier(0.22, 1, 0.36, 1)
+    `,
+
             textAlign: "center",
           }}
         >
@@ -81,13 +107,13 @@ export default function ScrollScene() {
               color: "#fff",
 
               fontSize: "clamp(28px, 2.5vw, 44px)",
+              marginRight: "70px",
+              transform: isMobile ? "none" : "translateX(-70px)",
               fontWeight: 700,
 
               lineHeight: 1,
 
-              marginBottom: "14px",
-
-              transform: "translateX(-70px)",
+              marginBottom: "1px",
             }}
           >
             Witness the era of
@@ -100,10 +126,11 @@ export default function ScrollScene() {
               background: "#fff",
               color: "#000",
 
-              fontSize: "clamp(22px, 2vw, 34px)",
               fontWeight: 700,
 
-              padding: "6px 14px",
+              fontSize: isMobile ? "18px" : "clamp(22px, 2vw, 34px)",
+
+              padding: isMobile ? "8px 12px" : "6px 14px",
 
               lineHeight: 1.05,
 

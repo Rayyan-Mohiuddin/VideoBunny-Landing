@@ -2,14 +2,16 @@
 
 import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState, useEffect } from "react";
 
 import { createRibbonMaterial } from "@/shaders/ribbonMaterial";
 
 function RibbonPlane({ formation }: { formation: number }) {
+  const formationRef = useRef(0);
+
   const meshRef = useRef<THREE.Mesh>(null);
 
-  const material = useMemo(() => createRibbonMaterial(), []);
+  const [material] = useState(() => createRibbonMaterial());
 
   const geometry = useMemo(() => {
     const geo = new THREE.PlaneGeometry(12, 0.45, 300, 20);
@@ -29,7 +31,7 @@ function RibbonPlane({ formation }: { formation: number }) {
 
       const normalized = Math.abs(x) / halfWidth;
 
-      let taper = Math.pow(Math.cos(normalized * Math.PI * 0.5), 0.8);
+      const taper = Math.pow(Math.cos(normalized * Math.PI * 0.5), 0.8);
 
       //   if (normalized > 0.92) {
       //     const t = (normalized - 0.92) / 0.08;
@@ -55,9 +57,12 @@ function RibbonPlane({ formation }: { formation: number }) {
     const original = mesh.geometry.userData.original as Float32Array;
 
     const time = clock.getElapsedTime();
+    const material = mesh.material as THREE.ShaderMaterial;
 
     material.uniforms.uTime.value = time;
-    material.uniforms.uFormation.value = formation;
+    formationRef.current += (formation - formationRef.current) * 0.03;
+
+    material.uniforms.uFormation.value = formationRef.current;
 
     for (let i = 0; i < position.count; i++) {
       const x = original[i * 3];
@@ -86,6 +91,24 @@ function RibbonPlane({ formation }: { formation: number }) {
 }
 
 export default function RibbonShader({ formation }: { formation: number }) {
+  const [viewportWidth, setViewportWidth] = useState(1920);
+
+  useEffect(() => {
+    const update = () => {
+      setViewportWidth(window.innerWidth);
+    };
+
+    update();
+
+    window.addEventListener("resize", update);
+
+    return () => {
+      window.removeEventListener("resize", update);
+    };
+  }, []);
+
+  const isMobile = viewportWidth < 768;
+
   return (
     <div
       style={{
@@ -96,8 +119,8 @@ export default function RibbonShader({ formation }: { formation: number }) {
     >
       <Canvas
         camera={{
-          position: [0, 0, 6.6],
-          fov: 45,
+          position: [0, 0, isMobile ? 8 : 6.6],
+          fov: isMobile ? 55 : 45,
         }}
       >
         <RibbonPlane formation={formation} />
