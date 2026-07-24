@@ -7,6 +7,8 @@ import CreatorSection from "@/components/CreatorSection";
 import ViewerSection from "@/components/ViewerSection";
 import LeaderboardSection from "@/components/LeaderboardSection";
 import PingsPreviewSection from "@/components/PingsPreviewSection/PingsPreviewSection";
+import FooterSection from "@/components/landing/FooterSection";
+import FooterCTA from "@/components/landing/FooterCTA";
 
 export default function Home() {
   return (
@@ -39,6 +41,8 @@ export default function Home() {
       <LeaderboardSection />
 
       <PingsPreviewSection />
+
+      <FooterSection />
     </main>
   );
 }

@@ -1,212 +1,95 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useRef } from "react";
 import Image from "next/image";
 
-import pingsPreviewImage from "@/assets/pings-preview.png";
+import ReflectionImage from "./ReflectionImage";
+import { PHONE_FRAME, PING_IMAGES } from "./assets";
+import { SECTION_HEIGHT } from "./constants";
+import styles from "./PingsPreviewSection.module.css";
 
-import ReflectionThumbnail from "./ReflectionVideo";
-import FloatingAvatar from "./FloatingAvatar";
-
-import { usePingsPreviewAnimations } from "@/hooks/usePingsPreviewAnimations";
-
-import type {
-  PreviewUser,
-  PreviewVideo,
-  PingsPreviewResponse,
-} from "@/types/pings-preview";
-
-const DESKTOP_AVATAR_POSITIONS = [
-  { x: 15, y: 24, size: 62 },
-  { x: 83, y: 22, size: 58 },
-  { x: 10, y: 56, size: 68 },
-  { x: 88, y: 58, size: 60 },
-  { x: 22, y: 82, size: 64 },
-];
+import usePingsPreviewAnimations from "@/hooks/usePingsPreviewAnimations";
 
 export default function PingsPreviewSection() {
-  const [users, setUsers] = useState<PreviewUser[]>([]);
-  const [videos, setVideos] = useState<PreviewVideo[]>([]);
-
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    checkMobile();
-
-    window.addEventListener("resize", checkMobile);
-
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
-
-  useEffect(() => {
-    let mounted = true;
-
-    async function fetchPreview() {
-      try {
-        const response = await fetch("/api/pings-preview", {
-          cache: "no-store",
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch preview data.");
-        }
-
-        const data: PingsPreviewResponse = await response.json();
-
-        if (!mounted) return;
-
-        setUsers(data.users);
-        setVideos(data.videos);
-      } catch (err) {
-        console.error(err);
-
-        if (!mounted) return;
-
-        setError("Unable to load preview.");
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
-      }
-    }
-
-    fetchPreview();
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  const topVideo = videos[currentIndex];
-  const mainVideo = videos[currentIndex + 1];
-  const bottomVideo = videos[currentIndex + 2];
-
-  const avatars = useMemo(() => {
-    return users.slice(0, 5);
-  }, [users]);
-
-  const sectionRef = useRef<HTMLElement>(null);
+  const sectionRef = useRef<HTMLDivElement>(null);
   const stickyRef = useRef<HTMLDivElement>(null);
-  const headingRef = useRef<HTMLDivElement>(null);
+
+  const titleRef = useRef<HTMLDivElement>(null);
+
   const phoneWrapperRef = useRef<HTMLDivElement>(null);
 
-  const mainVideoRef = useRef<HTMLDivElement>(null);
-  const topReflectionRef = useRef<HTMLDivElement>(null);
-  const bottomReflectionRef = useRef<HTMLDivElement>(null);
+  // Phone screen
+  const screenRef = useRef<HTMLDivElement>(null);
+  const screenImageRef = useRef<HTMLImageElement>(null);
 
-  const topReflectionWrapperRef = useRef<HTMLDivElement>(null);
-  const mainVideoWrapperRef = useRef<HTMLDivElement>(null);
-  const bottomReflectionWrapperRef = useRef<HTMLDivElement>(null);
+  // Reflection wrappers
+  const previousReflectionRef = useRef<HTMLDivElement>(null);
+  const nextReflectionRef = useRef<HTMLDivElement>(null);
 
-  const avatarRefs = useRef<(HTMLDivElement | null)[]>([]);
+  // Reflection images
+  const previousReflectionImageRef = useRef<HTMLImageElement>(null);
+  const nextReflectionImageRef = useRef<HTMLImageElement>(null);
 
   usePingsPreviewAnimations({
-    videos,
-    currentIndex,
-    setCurrentIndex,
-
     sectionRef,
     stickyRef,
-    headingRef,
+
+    titleRef,
+
     phoneWrapperRef,
 
-    topReflectionWrapperRef,
-    mainVideoWrapperRef,
-    bottomReflectionWrapperRef,
+    screenRef,
+    screenImageRef,
 
-    topReflectionRef,
-    mainVideoRef,
-    bottomReflectionRef,
+    previousReflectionRef,
+    previousReflectionImageRef,
 
-    avatarRefs,
-
-    topReflectionRotationDeg: 2.03,
-    mainVideoRotationDeg: -5.96,
-    bottomReflectionRotationDeg: -2.03,
+    nextReflectionRef,
+    nextReflectionImageRef,
   });
-
-  if (loading) {
-    return (
-      <section
-        style={{
-          background: "#000",
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          color: "#fff",
-        }}
-      >
-        Loading...
-      </section>
-    );
-  }
-
-  if (error || !mainVideo) {
-    return (
-      <section
-        style={{
-          background: "#000",
-          minHeight: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          color: "#fff",
-        }}
-      >
-        {error || "Preview unavailable."}
-      </section>
-    );
-  }
 
   return (
     <section
       ref={sectionRef}
       style={{
         position: "relative",
-        height: "180vh",
+        height: SECTION_HEIGHT,
         background: "#000",
       }}
     >
       <div
         ref={stickyRef}
+        className={styles.sticky}
         style={{
           position: "sticky",
           top: 0,
           height: "100vh",
           overflow: "hidden",
+
           display: "flex",
-          flexDirection: "column",
           alignItems: "center",
-          justifyContent: "flex-start",
-          paddingTop: "50px", // was 90px
+
+          padding: "0 clamp(32px,5vw,96px)",
+
+          touchAction: "none",
         }}
       >
+        {/* LEFT */}
+
         <div
-          ref={headingRef}
+          ref={titleRef}
+          className={styles.title}
           style={{
-            textAlign: "center",
-            color: "#fff",
-            marginBottom: isMobile ? "48px" : "72px",
-            zIndex: 20,
+            opacity: 0,
           }}
         >
           <h2
             style={{
-              fontSize: isMobile ? "0.75rem" : "2rem",
-              fontWeight: 300,
-              lineHeight: 1.15,
-              letterSpacing: "-0.03em",
-              margin: 0,
+              color: "#fff",
+              fontSize: "clamp(36px,4vw,50px)",
+              lineHeight: 1.1,
+              fontWeight: 500,
+              letterSpacing: "-0.04em",
             }}
           >
             Interacting with content
@@ -215,134 +98,129 @@ export default function PingsPreviewSection() {
           </h2>
         </div>
 
-        {!isMobile &&
-          avatars.map((avatar, index) => {
-            const pos = DESKTOP_AVATAR_POSITIONS[index];
-
-            if (!pos) return null;
-
-            return (
-              <FloatingAvatar
-                key={avatar.id}
-                ref={(el) => {
-                  avatarRefs.current[index] = el;
-                }}
-                src={avatar.avatar}
-                alt={avatar.fullName}
-                size={pos.size}
-                x={pos.x}
-                y={pos.y}
-              />
-            );
-          })}
+        {/* RIGHT */}
 
         <div
           ref={phoneWrapperRef}
+          className={styles.phoneWrapper}
           style={{
             position: "relative",
-            width: isMobile ? 280 : 700,
+
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            top: -30,
+
+            opacity: 0,
           }}
         >
-          {topVideo && (
-            <div
-              ref={topReflectionWrapperRef}
-              style={{
-                position: "absolute",
-                left: "39.77%",
-                top: "1.06%",
-                width: "19.22%",
-                height: "16.62%",
-                transform: "rotate(2.03deg)",
-                transformOrigin: "center center",
-                zIndex: 1,
-              }}
-            >
-              <ReflectionThumbnail
-                ref={topReflectionRef}
-                src={topVideo.image}
-                mask="top"
-                opacity={0.25}
-                scale={0.95}
-                rotate={-2}
-                blur={4}
-              />
-            </div>
-          )}
-
-          {bottomVideo && (
-            <div
-              ref={bottomReflectionWrapperRef}
-              style={{
-                position: "absolute",
-                left: "39.77%",
-                top: "81.19%",
-                width: "19.22%",
-                height: "16.62%",
-                transform: "rotate(-2.03deg)",
-                transformOrigin: "center center",
-                zIndex: 1,
-              }}
-            >
-              <ReflectionThumbnail
-                ref={bottomReflectionRef}
-                src={bottomVideo.image}
-                mask="bottom"
-                opacity={1}
-                scale={0.95}
-                rotate={-2}
-                blur={4}
-              />
-            </div>
-          )}
-
-          <Image
-            src={pingsPreviewImage}
-            alt="Pings Preview"
-            priority
-            draggable={false}
-            style={{
-              width: "100%",
-              height: "auto",
-              display: "block",
-              position: "relative",
-              zIndex: 5,
-              userSelect: "none",
-              pointerEvents: "none",
-            }}
-          />
+          {/* Previous Reflection */}
 
           <div
-            ref={mainVideoWrapperRef}
+            ref={previousReflectionRef}
             style={{
               position: "absolute",
-              left: "44.58%",
-              top: "22%",
-              width: "17.24%",
-              height: "54.87%",
-              overflow: "hidden",
-              borderRadius: "16px",
-              zIndex: 5,
-              background: "#000",
-              transform: "rotate(-5.96deg)",
-              // sells the recess: dark falloff toward bottom-right (away from the
-              // mockup's top-left light), faint rim light top-left, hairline edge
-              boxShadow:
-                "inset 6px 6px 14px rgba(0,0,0,0.35), inset -2px -2px 6px rgba(255,255,255,0.12)",
-              border: "1px solid rgba(0,0,0,0.35)",
+              top: "calc(-1 * clamp(154px, 42vw, 220px))",
+              left: "50%",
+              transform: "translateX(-50%)",
+              zIndex: 1,
             }}
           >
-            <ReflectionThumbnail
-              ref={mainVideoRef}
-              src={mainVideo.image}
-              mask="none"
-              opacity={1}
-              scale={1}
-              rotate={0}
-              blur={0}
+            <ReflectionImage
+              position="top"
+              imageRef={previousReflectionImageRef}
+              initialSrc={PING_IMAGES[0].src}
+            />
+          </div>
+
+          {/* Phone */}
+
+          <div
+            style={{
+              position: "relative",
+              width: "clamp(220px, 60vw, 314px)",
+              aspectRatio: "314 / 500",
+              zIndex: 10,
+            }}
+          >
+            {/* Screen */}
+
+            <div
+              ref={screenRef}
+              style={{
+                position: "absolute",
+
+                left: "20%",
+                top: "10%",
+
+                width: "55%",
+                height: "83%",
+
+                overflow: "hidden",
+
+                borderRadius: 30,
+
+                zIndex: 2,
+
+                transform: `
+                  perspective(1800px)
+                  rotateY(-32deg)
+                `,
+              }}
+            >
+              <img
+                ref={screenImageRef}
+                src={PING_IMAGES[1].src}
+                alt=""
+                draggable={false}
+                style={{
+                  width: "100%",
+                  height: "100%",
+
+                  objectFit: "cover",
+
+                  display: "block",
+
+                  userSelect: "none",
+
+                  pointerEvents: "none",
+                }}
+              />
+            </div>
+
+            {/* Phone Frame */}
+
+            <Image
+              src={PHONE_FRAME}
+              alt=""
+              fill
+              priority
+              draggable={false}
+              sizes="(min-width: 1024px) 314px, 60vw"
+              style={{
+                objectFit: "contain",
+                pointerEvents: "none",
+                userSelect: "none",
+                zIndex: 1,
+              }}
+            />
+          </div>
+
+          {/* Next Reflection */}
+
+          <div
+            ref={nextReflectionRef}
+            style={{
+              position: "absolute",
+              bottom: "calc(-1 * clamp(154px, 42vw, 220px))",
+              left: "50%",
+              transform: "translateX(-50%)",
+              zIndex: 1,
+            }}
+          >
+            <ReflectionImage
+              position="bottom"
+              imageRef={nextReflectionImageRef}
+              initialSrc={PING_IMAGES[2].src}
             />
           </div>
         </div>

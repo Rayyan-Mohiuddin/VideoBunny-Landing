@@ -6,6 +6,8 @@ export async function getLeaderboardData(): Promise<LeaderboardUser[]> {
   const res = await fetch("/api/leaderboard");
 
   if (!res.ok) {
+    const text = await res.text();
+    console.error(text);
     throw new Error("Failed to load leaderboard.");
   }
 

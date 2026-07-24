@@ -1,0 +1,36 @@
+.sticky {
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(24px, 5vh, 48px);
+}
+
+.title {
+  width: 100%;
+  text-align: center;
+  position: relative;
+  top: clamp(-64px, -10vh, -24px);
+}
+
+.phoneWrapper {
+  width: 100%;
+  height: auto;
+}
+
+@media (min-width: 1024px) {
+  .sticky {
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 0;
+  }
+
+  .title {
+    width: 36%;
+    text-align: left;
+    top: 0;
+  }
+
+  .phoneWrapper {
+    width: 40%;
+    height: 100%;
+  }
+}
