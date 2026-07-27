@@ -1,17 +1,19 @@
 "use client";
 
-import RibbonShader from "./RibbonShader";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import Navbar from "./Navbar";
 import PhoneStack from "./PhoneShowcase";
+import HeroWaitlistButton from "./HeroWaitlistButton";
 import { createTimeline } from "animejs";
+import heroBgDesktop from "@/assets/hero-bg-desktop.svg";
 
 export default function ScrollScene() {
-  const [formation, setFormation] = useState(0);
   const [headlineReveal, setHeadlineReveal] = useState(0);
   const [navReveal, setNavReveal] = useState(0);
   const [phoneReveal, setPhoneReveal] = useState(0);
   const [phoneSpread, setPhoneSpread] = useState(0);
+  const [ctaReveal, setCtaReveal] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -37,9 +39,6 @@ export default function ScrollScene() {
 
     timeline
       .call(() => {
-        setFormation(1);
-      }, 200)
-      .call(() => {
         setNavReveal(1);
       }, 1200)
       .call(() => {
@@ -50,7 +49,10 @@ export default function ScrollScene() {
       }, 2800)
       .call(() => {
         setPhoneSpread(1);
-      }, 4200);
+      }, 4200)
+      .call(() => {
+        setCtaReveal(1);
+      }, 4800);
 
     return () => {
       timeline.revert();
@@ -63,22 +65,47 @@ export default function ScrollScene() {
         width: "100%",
         height: "100%",
         position: "relative",
-        background: "#000",
+        background: "#070707",
         overflow: "hidden",
       }}
     >
-      <RibbonShader formation={formation} />
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          zIndex: 0,
+          pointerEvents: "none",
+        }}
+        aria-hidden
+      >
+        <Image
+          src={heroBgDesktop}
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          style={{
+            objectFit: "cover",
+            // Desktop: horizon glow sits mid-lower behind phones.
+            // Mobile: shift up so the purple bloom fills the upper mid area.
+            objectPosition: isMobile ? "center 28%" : "center center",
+          }}
+        />
+      </div>
 
       <div
         style={{
           position: "absolute",
           inset: 0,
+          zIndex: 1,
 
           display: "flex",
-          justifyContent: "center",
+          justifyContent: "flex-start",
           alignItems: "flex-start",
 
-          paddingTop: isMobile ? "18vh" : "22vh",
+          paddingTop: isMobile ? "14vh" : "16vh",
+          paddingLeft: isMobile ? 24 : 64,
+          paddingRight: isMobile ? 24 : 64,
 
           pointerEvents: "none",
         }}
@@ -99,52 +126,51 @@ export default function ScrollScene() {
       filter 1200ms cubic-bezier(0.22, 1, 0.36, 1)
     `,
 
-            textAlign: "center",
+            textAlign: "left",
+            maxWidth: isMobile ? 340 : 920,
           }}
         >
-          <div
+          <h1
             style={{
+              margin: 0,
               color: "#fff",
-
-              fontSize: "clamp(28px, 2.5vw, 44px)",
-              marginRight: "70px",
-              transform: isMobile ? "none" : "translateX(-70px)",
-              fontWeight: 700,
-
-              lineHeight: 1,
-
-              marginBottom: "1px",
+              fontSize: isMobile
+                ? "clamp(34px, 9vw, 44px)"
+                : "clamp(44px, 4.6vw, 68px)",
+              fontWeight: 600,
+              lineHeight: 1.12,
+              letterSpacing: "-0.02em",
             }}
           >
-            Witness the era of
-          </div>
+            {isMobile ? (
+              <>
+                Content should be
 
-          <span
-            style={{
-              display: "inline-block",
-
-              background: "#fff",
-              color: "#000",
-
-              fontWeight: 700,
-
-              fontSize: isMobile ? "18px" : "clamp(22px, 2vw, 34px)",
-
-              padding: isMobile ? "8px 12px" : "6px 14px",
-
-              lineHeight: 1.05,
-
-              borderRadius: 0,
-            }}
-          >
-            Interactive content marketplace
-          </span>
+                more then just
+                <br />
+                <em style={{ fontStyle: "italic", fontWeight: 400 }}>
+                  Scrolling videos
+                </em>
+              </>
+            ) : (
+              <>
+                Content should be more
+                <br />
+                then just{" "}
+                <em style={{ fontStyle: "italic", fontWeight: 400 }}>
+                  Scrolling videos
+                </em>
+              </>
+            )}
+          </h1>
         </div>
       </div>
 
       <Navbar reveal={navReveal} />
 
       <PhoneStack reveal={phoneReveal} spread={phoneSpread} />
+
+      <HeroWaitlistButton reveal={ctaReveal} isMobile={isMobile} />
     </div>
   );
 }

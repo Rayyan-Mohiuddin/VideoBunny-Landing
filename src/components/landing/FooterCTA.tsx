@@ -18,20 +18,7 @@ const FooterCTA = forwardRef<HTMLDivElement, FooterCTAProps>(
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
         <div
           ref={cardRef}
-          className="
-            relative
-            w-[82vw]
-            max-w-[1200px]
-            h-[560px]
-            rounded-[48px]
-            overflow-visible
-            px-24
-            flex
-            items-center
-            justify-between
-            opacity-0
-            will-change-transform
-          "
+          className="relative w-[82vw] max-w-[1200px] h-[560px] rounded-[48px] overflow-visible px-24 flex items-center justify-between opacity-0 will-change-transform"
           style={{
             background: `
     linear-gradient(
@@ -50,24 +37,9 @@ const FooterCTA = forwardRef<HTMLDivElement, FooterCTAProps>(
 
           <div
             ref={textRef}
-            className="
-              flex
-              flex-col
-              gap-10
-              max-w-[560px]
-              opacity-0
-              will-change-transform
-            "
+            className="flex flex-col gap-10 max-w-[560px] opacity-0 will-change-transform"
           >
-            <h2
-              className="
-                text-white
-                text-[72px]
-                leading-[1]
-                font-semibold
-                tracking-[-0.04em]
-              "
-            >
+            <h2 className="text-white text-[72px] leading-[1] font-semibold tracking-[-0.04em]">
               Powering engagement
               <br />
               where <em className="italic font-medium">best</em> wins
@@ -75,21 +47,7 @@ const FooterCTA = forwardRef<HTMLDivElement, FooterCTAProps>(
 
             <button
               ref={buttonRef}
-              className="
-                w-fit
-                rounded-2xl
-                bg-white
-                text-black
-                text-xl
-                font-medium
-                px-8
-                py-4
-                opacity-0
-                transition-colors
-                pointer-events-auto
-                hover:bg-zinc-100
-                will-change-transform
-              "
+              className="w-fit rounded-2xl bg-white text-black text-xl font-medium px-8 py-4 opacity-0 transition-colors pointer-events-auto hover:bg-zinc-100 will-change-transform"
             >
               Join Contest Now
             </button>
@@ -99,24 +57,13 @@ const FooterCTA = forwardRef<HTMLDivElement, FooterCTAProps>(
 
           <div
             ref={trophyRef}
-            className="
-              absolute
-              right-10
-              -top-36
-              opacity-0
-              will-change-transform
-            "
+            className="absolute right-10 -top-36 opacity-0 will-change-transform"
           >
             <Image
               src={trophy}
               alt="Trophy"
               priority
-              className="
-                w-[520px]
-                h-auto
-                select-none
-                pointer-events-none
-              "
+              className="w-[520px] h-auto select-none pointer-events-none"
             />
           </div>
         </div>

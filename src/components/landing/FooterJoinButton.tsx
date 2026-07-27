@@ -21,49 +21,11 @@ export default function FooterJoinButton({
       className="absolute inset-0 opacity-0 overflow-hidden will-change-transform"
     >
       {/* Background */}
-
-      <div
-        className="absolute inset-0"
-        style={{
-          background: `
-            radial-gradient(circle at 50% 115%, rgba(78,108,255,.9) 0%, rgba(78,108,255,.45) 28%, transparent 58%),
-            radial-gradient(circle at 20% 120%, rgba(103,67,255,.45), transparent 45%),
-            radial-gradient(circle at 80% 120%, rgba(103,67,255,.45), transparent 45%),
-            linear-gradient(
-              180deg,
-              #05050A 0%,
-              #0A0815 18%,
-              #151034 45%,
-              #2A1D70 78%,
-              #4F68FF 100%
-            )
-          `,
-        }}
-      />
+      {/*removed the circular gradient*/}
 
       {/* Watermark */}
 
-      <h1
-        className="
-          absolute
-          left-1/2
-          top-[88%]
-          -translate-x-1/2
-          -translate-y-1/2
-
-          whitespace-nowrap
-
-          text-[clamp(90px,10vw,220px)]
-          font-bold
-          tracking-[-0.06em]
-
-          text-[#1B246E]
-          opacity-[0.28]
-
-          select-none
-          pointer-events-none
-        "
-      >
+      <h1 className="absolute left-1/2 top-[88%] -translate-x-1/2 -translate-y-1/2 whitespace-nowrap text-[clamp(90px,10vw,220px)] font-bold tracking-[-0.06em] text-[#1B246E] opacity-[0.28] select-none pointer-events-none">
         Videobunny
       </h1>
 
@@ -71,18 +33,7 @@ export default function FooterJoinButton({
 
       <button
         ref={buttonRef}
-        className="
-          absolute
-
-          left-1/2
-          top-[74%]
-
-          -translate-x-1/2
-          -translate-y-1/2
-
-          h-36
-          w-36
-        "
+        className="absolute left-1/2 top-[74%] -translate-x-1/2 -translate-y-1/2 h-36 w-36"
       >
         <Image
           src={videobunnyLogo}
@@ -95,47 +46,16 @@ export default function FooterJoinButton({
 
       <div
         ref={arrowRef}
-        className="
-          absolute
-
-          left-[53%]
-          top-[57.5%]
-
-          -translate-x-[-10px]
-
-          flex
-          items-start
-          gap-2
-
-          opacity-0
-
-          will-change-transform
-        "
+        className="absolute left-[53%] top-[57.5%] -translate-x-[-10px] flex items-start gap-2 opacity-0 will-change-transform"
       >
-        <span
-          className="
-      absolute
-      -top-4
-      left-17
-      text-white
-      text-lg
-      font-medium
-      whitespace-nowrap
-    "
-        >
+        <span className="absolute -top-4 left-17 text-white text-lg font-medium whitespace-nowrap">
           Join now
         </span>
 
         <Image
           src={arrow}
           alt=""
-          className="
-            -ml-3
-            w-20
-            h-auto
-            select-none
-            pointer-events-none
-          "
+          className="-ml-3 w-20 h-auto select-none pointer-events-none"
         />
       </div>
     </div>

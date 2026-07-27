@@ -155,8 +155,6 @@ export default function useFooterAnimations({
       if (glow) {
         const gOpacity = range(p, 0, 0.15, 0, 1, easeOutCubic);
         const gScale = range(p, 0, 0.15, 1.3, 1, easeOutCubic);
-        glow.style.background =
-          "radial-gradient(circle at 50% 100%, rgba(130,88,255,.55), transparent 60%)";
         glow.style.opacity = String(gOpacity);
         glow.style.transform = `scale(${gScale})`;
       }
