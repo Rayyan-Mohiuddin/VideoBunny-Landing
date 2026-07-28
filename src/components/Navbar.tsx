@@ -71,20 +71,20 @@ export default function Navbar({ reveal }: NavbarProps) {
 
           border: "none",
 
-          borderRadius: 999,
+          borderRadius: 12,
 
           padding: "clamp(8px,1.8vw,12px) clamp(18px,3vw,30px)",
 
           fontSize: 16,
 
-          fontWeight: 600,
+          fontWeight: 800,
 
           cursor: "pointer",
 
-          boxShadow: "0 0 24px rgba(255,210,70,.65)",
+
         }}
       >
-        Join waitlist
+        Join the waitlist
       </button>
     </nav>
   );

@@ -5,6 +5,7 @@ import Image from "next/image";
 import Navbar from "./Navbar";
 import PhoneStack from "./PhoneShowcase";
 import HeroWaitlistButton from "./HeroWaitlistButton";
+import FlickingFeedIcon from "./FlickingFeedIcon";
 import { createTimeline } from "animejs";
 import heroBgDesktop from "@/assets/hero-bg-desktop.svg";
 
@@ -130,39 +131,56 @@ export default function ScrollScene() {
             maxWidth: isMobile ? 340 : 920,
           }}
         >
-          <h1
+          <div
             style={{
-              margin: 0,
-              color: "#fff",
-              fontSize: isMobile
-                ? "clamp(34px, 9vw, 44px)"
-                : "clamp(44px, 4.6vw, 68px)",
-              fontWeight: 600,
-              lineHeight: 1.12,
-              letterSpacing: "-0.02em",
+              display: "flex",
+              alignItems: "flex-start",
+              gap: isMobile ? 8 : 18,
             }}
           >
-            {isMobile ? (
-              <>
-                Content should be
+            <h1
+              style={{
+                margin: 0,
+                color: "#fff",
+                fontSize: isMobile
+                  ? "clamp(34px, 9vw, 44px)"
+                  : "clamp(44px, 4.6vw, 68px)",
+                fontWeight: 600,
+                lineHeight: 1.12,
+                letterSpacing: "-0.02em",
+              }}
+            >
+              {isMobile ? (
+                <>
+                  Content should be
 
-                more then just
-                <br />
-                <em style={{ fontStyle: "italic", fontWeight: 400 }}>
-                  Scrolling videos
-                </em>
-              </>
-            ) : (
-              <>
-                Content should be more
-                <br />
-                then just{" "}
-                <em style={{ fontStyle: "italic", fontWeight: 400 }}>
-                  Scrolling videos
-                </em>
-              </>
-            )}
-          </h1>
+                  more then just{" "}
+
+                  <em style={{ fontStyle: "italic", fontWeight: 400 }}>
+                    Scrolling videos
+                  </em>
+                </>
+              ) : (
+                <>
+                  Content should be more
+                  <br />
+                  then just{" "}
+                  <em style={{ fontStyle: "italic", fontWeight: 400 }}>
+                    Scrolling videos
+                  </em>
+                </>
+              )}
+            </h1>
+
+            <div
+              style={{
+                marginTop: isMobile ? 8 : 6,
+                flexShrink: 0,
+              }}
+            >
+              <FlickingFeedIcon width={isMobile ? 42 : 54} height={isMobile ? 92 : 110} />
+            </div>
+          </div>
         </div>
       </div>
 
