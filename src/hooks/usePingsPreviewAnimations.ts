@@ -31,17 +31,26 @@ interface UsePingsPreviewAnimationsParams {
 type Direction = 1 | -1;
 
 // ---- tunables (no magic numbers scattered through the logic) ----
-const TITLE_DURATION_MS = 700;
-const PHONE_DURATION_MS = 700;
-const PING_DURATION_MS = 700;
+const TITLE_DURATION_MS = 450;
+const PHONE_DURATION_MS = 450;
+const PING_DURATION_MS = 450;
 
 const EASE = "outQuart";
 
-// Ignore additional wheel/touch input for this long after a step finishes.
-// Trackpads/mice/touch emit a long tail of small events for a single
-// physical gesture; without this a single swipe can chain through
-// several steps at once, which is what reads as "not smooth".
-const WHEEL_COOLDOWN_MS = 450;
+// Quiet period after a step: any wheel event that arrives inside this
+// window restarts the timer rather than queuing another step. Short
+// enough that a genuinely new gesture isn't kept waiting, long enough
+// that the trailing events of one continuous flick can't slip through
+// as a second step.
+const WHEEL_COOLDOWN_MS = 220;
+
+// Hard ceiling on total lockout time, regardless of how many trailing
+// events keep extending the debounce. Without this, a trackpad's
+// inertial momentum tail (which can keep sending small wheel events
+// for well over a second) would keep resetting the timer and the
+// section would stay locked for the full length of that momentum,
+// not just the intended quiet period.
+const WHEEL_COOLDOWN_CEILING_MS = 500;
 
 // How far (px) a touch drag has to travel before it counts as one step.
 const TOUCH_STEP_THRESHOLD_PX = 40;
@@ -82,6 +91,8 @@ export default function usePingsPreviewAnimations({
   const stepRef = useRef(0);
   const isAnimatingRef = useRef(false);
   const isCoolingDownRef = useRef(false);
+  const cooldownTimeoutRef = useRef<number | null>(null);
+  const cooldownStartRef = useRef(0);
   const isLockedRef = useRef(false);
   const hasEnteredRef = useRef(false);
 
@@ -349,6 +360,40 @@ export default function usePingsPreviewAnimations({
       }
     }
 
+    // Starts (or extends) the post-step quiet period. `isInitial` marks
+    // the call right after a step finishes, which resets the ceiling
+    // clock; subsequent calls (from trailing wheel events while already
+    // cooling down) extend the debounce but can never push the total
+    // lockout past WHEEL_COOLDOWN_CEILING_MS from that starting point —
+    // so a long inertial momentum tail eventually releases on its own
+    // instead of holding the lock for as long as it keeps sending events.
+    function armCooldown(isInitial: boolean) {
+      if (isInitial) {
+        cooldownStartRef.current = performance.now();
+      }
+
+      isCoolingDownRef.current = true;
+
+      if (cooldownTimeoutRef.current !== null) {
+        window.clearTimeout(cooldownTimeoutRef.current);
+      }
+
+      const elapsed = performance.now() - cooldownStartRef.current;
+      const remainingBudget = Math.max(0, WHEEL_COOLDOWN_CEILING_MS - elapsed);
+      const waitMs = Math.min(WHEEL_COOLDOWN_MS, remainingBudget);
+
+      if (waitMs <= 0) {
+        isCoolingDownRef.current = false;
+        cooldownTimeoutRef.current = null;
+        return;
+      }
+
+      cooldownTimeoutRef.current = window.setTimeout(() => {
+        isCoolingDownRef.current = false;
+        cooldownTimeoutRef.current = null;
+      }, waitMs);
+    }
+
     async function step(direction: Direction) {
       isAnimatingRef.current = true;
       try {
@@ -359,10 +404,7 @@ export default function usePingsPreviewAnimations({
         }
       } finally {
         isAnimatingRef.current = false;
-        isCoolingDownRef.current = true;
-        window.setTimeout(() => {
-          isCoolingDownRef.current = false;
-        }, WHEEL_COOLDOWN_MS);
+        armCooldown(true);
       }
     }
 
@@ -396,12 +438,36 @@ export default function usePingsPreviewAnimations({
       void step(direction);
     }
 
+    function isPinnedNow(): boolean {
+      const rect = section.getBoundingClientRect();
+      return rect.top <= 0 && rect.bottom > window.innerHeight;
+    }
+
     function handleWheel(event: WheelEvent) {
+      // The section's own scroll range is the only place this should
+      // ever intercept. Without this check, once the listeners are
+      // attached (see handleEnter below) they'd keep firing on every
+      // wheel event site-wide, forever — including far below or above
+      // this section — which is what caused scrolling to freeze
+      // elsewhere on the page.
+      if (!isPinnedNow()) return;
+
       const direction = resolveDirection(event.deltaY);
       if (direction === 0) return;
       if (!shouldIntercept(direction)) return;
 
       event.preventDefault();
+
+      if (isAnimatingRef.current) return;
+
+      if (isCoolingDownRef.current) {
+        // Still inside the tail of the same physical gesture — extend
+        // the quiet period instead of letting this event queue a step.
+        // (Capped by armCooldown's ceiling — see its comment above.)
+        armCooldown(false);
+        return;
+      }
+
       tryStep(direction);
     }
 
@@ -416,6 +482,7 @@ export default function usePingsPreviewAnimations({
 
     function handleTouchMove(event: TouchEvent) {
       if (event.touches.length !== 1) return;
+      if (!isPinnedNow()) return;
 
       const currentY = event.touches[0].clientY;
       const deltaY = touchStartY - currentY; // finger up -> positive -> forward
@@ -462,23 +529,44 @@ export default function usePingsPreviewAnimations({
     // actually pinned to the top. Instead, wait until the sticky panel
     // itself is genuinely pinned (its top has reached the viewport top
     // and its bottom hasn't scrolled past it yet).
+    //
+    // This also runs continuously (not just once) after entry, so that
+    // if the user leaves the pinned range via the scrollbar (rather
+    // than by wheel-stepping through it) the step counter gets resynced
+    // to match which side they left from — otherwise it stays wherever
+    // the last wheel-driven step left it, out of sync with reality.
     let rafId: number | null = null;
 
-    function checkPinned() {
+    function checkSectionState() {
       rafId = null;
-      if (hasEnteredRef.current) return;
 
       const rect = section.getBoundingClientRect();
       const isPinned = rect.top <= 0 && rect.bottom > window.innerHeight;
 
-      if (isPinned) {
-        handleEnter();
+      if (!hasEnteredRef.current) {
+        if (isPinned) handleEnter();
+        return;
+      }
+
+      if (isPinned || isAnimatingRef.current) return;
+
+      const isPastEnd = rect.bottom <= 0;
+      const isBeforeStart = rect.top >= window.innerHeight;
+
+      if (isPastEnd && stepRef.current !== TOTAL_STEPS) {
+        stepRef.current = TOTAL_STEPS;
+        isCoolingDownRef.current = false;
+        unlockScroll();
+      } else if (isBeforeStart && stepRef.current !== 0) {
+        stepRef.current = 0;
+        isCoolingDownRef.current = false;
+        unlockScroll();
       }
     }
 
     function scheduleCheck() {
       if (rafId !== null) return;
-      rafId = window.requestAnimationFrame(checkPinned);
+      rafId = window.requestAnimationFrame(checkSectionState);
     }
 
     // in case the page loads already scrolled into the pinned range
@@ -495,6 +583,9 @@ export default function usePingsPreviewAnimations({
       window.removeEventListener("touchstart", handleTouchStart);
       window.removeEventListener("touchmove", handleTouchMove);
       window.removeEventListener("touchend", handleTouchEnd);
+      if (cooldownTimeoutRef.current !== null) {
+        window.clearTimeout(cooldownTimeoutRef.current);
+      }
       unlockScroll();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
