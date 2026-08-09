@@ -14,8 +14,10 @@ type PhoneStackProps = {
 export default function PhoneStack({ reveal, spread }: PhoneStackProps) {
   const ease = 1 - Math.pow(1 - reveal, 3);
   const [isMobile, setIsMobile] = useState(false);
-  const fanout = isMobile ? 110 : 140;
-  const restingY = isMobile ? -28 : 135;
+  const fanout = isMobile ? 130 : 180;
+  const restingY = isMobile ? -8 : 80;
+  const centerWidth = isMobile ? 220 : 280;
+  const sideWidth = isMobile ? 290 : 400;
 
   useEffect(() => {
     const update = () => {
@@ -43,7 +45,7 @@ export default function PhoneStack({ reveal, spread }: PhoneStackProps) {
 
         pointerEvents: "none",
 
-        transform: isMobile ? "translateY(18px) scale(0.78)" : "scale(1)",
+        transform: isMobile ? "translateY(12px)" : "none",
 
         transformOrigin: "bottom center",
       }}
@@ -57,8 +59,8 @@ export default function PhoneStack({ reveal, spread }: PhoneStackProps) {
 
           transform: `
       translateX(${-fanout * spread}px)
-      translateY(${isMobile ? -42 : 150}px)
-      scale(${0.9 + spread * 0.1})
+      translateY(${isMobile ? -36 : 100}px)
+      scale(${0.9 + spread * 0.01})
       rotate(${4 * spread}deg)
     `,
 
@@ -74,7 +76,7 @@ export default function PhoneStack({ reveal, spread }: PhoneStackProps) {
           src={phoneC}
           alt=""
           style={{
-            width: isMobile ? 220 : 330,
+            width: sideWidth,
             height: "auto",
             display: "block",
           }}
@@ -90,7 +92,7 @@ export default function PhoneStack({ reveal, spread }: PhoneStackProps) {
 
           transform: `
       translateX(${fanout * spread}px)
-      translateY(${isMobile ? -42 : 150}px)
+      translateY(${isMobile ? -36 : 100}px)
       scale(${0.9 + spread * 0.1})
       rotate(${-4 * spread}deg)
     `,
@@ -107,7 +109,7 @@ export default function PhoneStack({ reveal, spread }: PhoneStackProps) {
           src={phoneL}
           alt=""
           style={{
-            width: isMobile ? 220 : 330,
+            width: sideWidth,
             height: "auto",
             display: "block",
           }}
@@ -138,7 +140,7 @@ export default function PhoneStack({ reveal, spread }: PhoneStackProps) {
           src={phoneH}
           alt=""
           style={{
-            width: isMobile ? 180 : 240,
+            width: centerWidth,
             height: "auto",
             display: "block",
           }}

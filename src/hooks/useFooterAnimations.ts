@@ -155,8 +155,6 @@ export default function useFooterAnimations({
       if (glow) {
         const gOpacity = range(p, 0, 0.15, 0, 1, easeOutCubic);
         const gScale = range(p, 0, 0.15, 1.3, 1, easeOutCubic);
-        glow.style.background =
-          "radial-gradient(circle at 50% 100%, rgba(130,88,255,.55), transparent 60%)";
         glow.style.opacity = String(gOpacity);
         glow.style.transform = `scale(${gScale})`;
       }
@@ -254,7 +252,7 @@ export default function useFooterAnimations({
         const jbY = range(p, 0.82, 0.95, 100, 0, easeOutQuint);
         const jbScale = range(p, 0.82, 0.95, 0.8, 1, easeOutQuint);
         joinButton.style.opacity = String(jbOpacity);
-        joinButton.style.transform = `translate(-50%, calc(-50% + ${jbY}px)) scale(${jbScale})`;
+        joinButton.style.transform = `translateY(${jbY}px) scale(${jbScale})`;
       }
 
       // ---- 0.90 - 1.00  Arrow enters ---------------------------------------
@@ -262,7 +260,7 @@ export default function useFooterAnimations({
         const aOpacity = range(p, 0.9, 1, 0, 1, easeOutCubic);
         const aY = range(p, 0.9, 1, 20, 0, easeOutCubic);
         arrow.style.opacity = String(aOpacity);
-        arrow.style.transform = `translateX(-10px) translateY(${aY}px)`;
+        arrow.style.transform = `translateY(${aY}px)`;
 
         // Stroke-draw only applies if the arrow is an inline <svg><path>.
         // The current markup renders the arrow via next/image (an <img>),
