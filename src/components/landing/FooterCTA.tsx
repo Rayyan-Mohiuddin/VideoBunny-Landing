@@ -20,15 +20,16 @@ const FooterCTA = forwardRef<HTMLDivElement, FooterCTAProps>(
           ref={cardRef}
           className="
             relative
-            w-[82vw]
-            max-w-[1200px]
-            h-[560px]
-            rounded-[48px]
+
+            w-[90vw] max-w-[340px] h-[470px] rounded-[28px] pt-24 pb-8 px-6
+            md:w-[85vw] md:max-w-[820px] md:h-[480px] md:rounded-[40px] md:pt-0 md:pb-0 md:px-14
+            lg:w-[82vw] lg:max-w-[1200px] lg:h-[560px] lg:rounded-[48px] lg:px-24
+
             overflow-visible
-            px-24
-            flex
-            items-center
-            justify-between
+
+            flex flex-col items-center justify-center text-center
+            md:flex-row md:justify-between md:text-left
+
             opacity-0
             will-change-transform
           "
@@ -53,8 +54,17 @@ const FooterCTA = forwardRef<HTMLDivElement, FooterCTAProps>(
             className="
               flex
               flex-col
-              gap-10
-              max-w-[560px]
+              items-center
+              gap-6
+              max-w-full
+
+              md:items-stretch
+              md:gap-8
+              md:max-w-[420px]
+
+              lg:gap-10
+              lg:max-w-[560px]
+
               opacity-0
               will-change-transform
             "
@@ -62,10 +72,13 @@ const FooterCTA = forwardRef<HTMLDivElement, FooterCTAProps>(
             <h2
               className="
                 text-white
-                text-[72px]
                 leading-[1]
                 font-semibold
                 tracking-[-0.04em]
+
+                text-[clamp(2.2rem,8vw,4rem)]
+                md:text-[clamp(3rem,6vw,4.5rem)]
+                lg:text-[72px]
               "
             >
               Powering engagement
@@ -76,19 +89,19 @@ const FooterCTA = forwardRef<HTMLDivElement, FooterCTAProps>(
             <button
               ref={buttonRef}
               className="
-                w-fit
                 rounded-2xl
                 bg-white
                 text-black
-                text-xl
                 font-medium
-                px-8
-                py-4
                 opacity-0
                 transition-colors
                 pointer-events-auto
                 hover:bg-zinc-100
                 will-change-transform
+
+                w-full max-w-[270px] text-base px-6 py-3
+
+                md:w-fit md:text-xl md:px-8 md:py-4
               "
             >
               Join Contest Now
@@ -101,8 +114,10 @@ const FooterCTA = forwardRef<HTMLDivElement, FooterCTAProps>(
             ref={trophyRef}
             className="
               absolute
-              right-10
-              -top-36
+
+              left-1/2 -ml-[125px] -top-[72px]
+              md:left-auto md:ml-0 md:right-10 md:-top-36
+
               opacity-0
               will-change-transform
             "
@@ -112,7 +127,9 @@ const FooterCTA = forwardRef<HTMLDivElement, FooterCTAProps>(
               alt="Trophy"
               priority
               className="
-                w-[520px]
+                w-[250px]
+                md:w-[380px]
+                lg:w-[520px]
                 h-auto
                 select-none
                 pointer-events-none
