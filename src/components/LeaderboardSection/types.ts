@@ -1,3 +1,9 @@
+import type { StaticImageData } from "next/image";
+
+export interface LeaderboardVideo {
+  image: string | StaticImageData;
+}
+
 export interface LeaderboardUser {
   id: number;
 
@@ -5,9 +11,9 @@ export interface LeaderboardUser {
 
   username: string;
 
-  avatar: string;
+  avatar: string | StaticImageData;
 
   score: number;
 
-  video: any;
+  video: LeaderboardVideo;
 }

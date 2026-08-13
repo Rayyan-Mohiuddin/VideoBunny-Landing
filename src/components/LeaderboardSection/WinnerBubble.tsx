@@ -1,9 +1,9 @@
 "use client";
 
-import Image from "next/image";
+import Image, { type StaticImageData } from "next/image";
 
 export interface WinnerBubbleProps {
-  avatar: string;
+  avatar: string | StaticImageData;
   username: string;
   score: number;
   rank: number;
