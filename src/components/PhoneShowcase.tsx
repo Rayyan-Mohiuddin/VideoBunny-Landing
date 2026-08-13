@@ -14,10 +14,10 @@ type PhoneStackProps = {
 export default function PhoneStack({ reveal, spread }: PhoneStackProps) {
   const ease = 1 - Math.pow(1 - reveal, 3);
   const [isMobile, setIsMobile] = useState(false);
-  const fanout = isMobile ? 130 : 180;
+  const fanout = isMobile ? 130 : 160;
   const restingY = isMobile ? -8 : 80;
-  const centerWidth = isMobile ? 220 : 280;
-  const sideWidth = isMobile ? 290 : 400;
+  const centerWidth = isMobile ? 220 : 250;
+  const sideWidth = isMobile ? 290 : 360;
 
   useEffect(() => {
     const update = () => {
@@ -93,7 +93,7 @@ export default function PhoneStack({ reveal, spread }: PhoneStackProps) {
           transform: `
       translateX(${fanout * spread}px)
       translateY(${isMobile ? -36 : 100}px)
-      scale(${0.9 + spread * 0.1})
+      scale(${0.9 + spread * 0.01})
       rotate(${-4 * spread}deg)
     `,
 

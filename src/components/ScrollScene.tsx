@@ -152,10 +152,7 @@ export default function ScrollScene() {
             >
               {isMobile ? (
                 <>
-                  Content should be
-
-                  more then just{" "}
-
+                  Content should be more then just{" "}
                   <em style={{ fontStyle: "italic", fontWeight: 400 }}>
                     Scrolling videos
                   </em>
@@ -178,7 +175,10 @@ export default function ScrollScene() {
                 flexShrink: 0,
               }}
             >
-              <FlickingFeedIcon width={isMobile ? 42 : 54} height={isMobile ? 92 : 110} />
+              <FlickingFeedIcon
+                width={isMobile ? 42 : 54}
+                height={isMobile ? 92 : 110}
+              />
             </div>
           </div>
         </div>
