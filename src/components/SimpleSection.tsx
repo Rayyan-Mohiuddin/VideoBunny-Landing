@@ -126,13 +126,6 @@ export default function SimpleSection() {
       duration: 1400,
       ease: "outExpo",
     });
-
-    animate(".reflection-track", {
-      translateX: [-220, 0],
-      opacity: [0, 0.15],
-      duration: 1800,
-      ease: "outExpo",
-    });
   }, [showPhone]);
 
   return (

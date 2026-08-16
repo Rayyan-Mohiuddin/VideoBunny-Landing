@@ -139,6 +139,7 @@ export default function PhoneStack({ reveal, spread }: PhoneStackProps) {
         <Image
           src={phoneH}
           alt=""
+          priority
           style={{
             width: centerWidth,
             height: "auto",
